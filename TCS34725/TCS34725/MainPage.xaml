@@ -1,0 +1,27 @@
+﻿<Page
+    x:Class="TCS34725.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:TCS34725"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    >
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <StackPanel>
+            <TextBlock Text="Led"/>
+            <RadioButton x:Name="_LedRadioButtonOn" Content="On" GroupName="LedState" IsChecked="True" Checked="OnLedRadioChanged"/>
+            <RadioButton x:Name="_LedRadioButtonOff" Content="Off" GroupName="LedState" Checked="OnLedRadioChanged"/>
+            <Button Content="ReadRaw" Click="OnReadRawClicked"/>
+            <TextBlock Text="Clear"/>
+            <TextBlock x:Name="_Clear"/>
+            <TextBlock Text="Red"/>
+            <TextBlock x:Name="_Red"/>
+            <TextBlock Text="Green"/>
+            <TextBlock x:Name="_Green"/>
+            <TextBlock Text="Blue"/>
+            <TextBlock x:Name="_Blue"/>
+        </StackPanel>
+    </Grid>
+</Page>
