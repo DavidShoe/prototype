@@ -305,11 +305,12 @@ namespace BME280_I2C
             //H2: 346
             //H3: 0
             //H4: 357
-            //H5: 0
+            //H5: 0            //H6: 30
 
             await Task.Delay(1);
             return CalibrationData;
         }
+
         // Returns temperature in DegC, resolution is 0.01 DegC. Output value of “5123” equals 51.23 DegC.
         // t_fine carries fine temperature as global value
         Int32 t_fine = Int32.MinValue;
@@ -325,27 +326,29 @@ namespace BME280_I2C
             return T;
         }
 
+
         // Returns pressure in Pa as unsigned 32 bit integer in Q24.8 format (24 integer bits and 8 fractional bits).
         // Output value of “24674867” represents 24674867/256 = 96386.2 Pa = 963.862 hPa
-        UInt32 BME280_compensate_P_int64(Int32 adc_P)
+        Int64 BME280_compensate_P_Int64(Int32 adc_P)
         {
             Int64 var1, var2, p;
-            var1 = ((Int64)t_fine) - 128000;
+            var1 = t_fine - 128000;
             var2 = var1 * var1 * (Int64)CalibrationData.dig_P6;
             var2 = var2 + ((var1 * (Int64)CalibrationData.dig_P5) << 17);
-            var2 = var2 + (((Int64)CalibrationData.dig_P4) << 35);
+            var2 = var2 + ((Int64)CalibrationData.dig_P4 << 35);
             var1 = ((var1 * var1 * (Int64)CalibrationData.dig_P3) >> 8) + ((var1 * (Int64)CalibrationData.dig_P2) << 12);
-            var1 = (((((Int64)1) << 47) + var1)) * ((Int64)CalibrationData.dig_P1) >> 33;
+            var1 = (((((Int64)1 << 47) + var1)) * (Int64)CalibrationData.dig_P1) >> 33;
             if (var1 == 0)
             {
+                Debug.WriteLine("BME280_compensate_P_Int64 Jump out to avoid / 0");
                 return 0; // avoid exception caused by division by zero
             }
             p = 1048576 - adc_P;
             p = (((p << 31) - var2) * 3125) / var1;
-            var1 = (((Int64)CalibrationData.dig_P9) * (p >> 13) * (p >> 13)) >> 25;
-            var2 = (((Int64)CalibrationData.dig_P8) * p) >> 19;
-            p = ((p + var1 + var2) >> 8) + (((Int64)CalibrationData.dig_P7) << 4);
-            return (UInt32)p;
+            var1 = ((Int64)CalibrationData.dig_P9 * (p >> 13) * (p >> 13)) >> 25;
+            var2 = ((Int64)CalibrationData.dig_P8 * p) >> 19;
+            p = ((p + var1 + var2) >> 8) + ((Int64)CalibrationData.dig_P7 << 4);
+            return p;
         }
 
 
@@ -378,7 +381,7 @@ namespace BME280_I2C
             return (float)foo;
         }
 
-        public async Task<UInt32> ReadPreasure()
+        public async Task<float> ReadPreasure()
         {
             if (!Init) await Begin();
 
@@ -392,9 +395,9 @@ namespace BME280_I2C
             byte tlsb = ReadByte((byte)eRegisters.BME280_REGISTER_PRESSUREDATA_LSB);
             byte txlsb = ReadByte((byte)eRegisters.BME280_REGISTER_PRESSUREDATA_XLSB); // bits 7:4
             Int32 t = (tmsb << 12) + (tlsb << 4) + (txlsb >> 4);
-            UInt32 foo = BME280_compensate_P_int64(t);
+            Int64 foo = BME280_compensate_P_Int64(t);
 
-            return foo;
+            return ((float)foo) / 256;
         }
 
         public async Task<Int32> ReadHumidity()

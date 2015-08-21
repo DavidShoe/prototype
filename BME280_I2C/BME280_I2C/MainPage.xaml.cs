@@ -51,7 +51,7 @@ namespace BME280_I2C
         private async void OnReadButtonClick(object sender, RoutedEventArgs e)
         {
             float temp = 0;
-            UInt32 preasure = 0;
+            float preasure = 0;
             Int32 humidity = 0;
             for (int i = 0; i < 10; i++)
             {
