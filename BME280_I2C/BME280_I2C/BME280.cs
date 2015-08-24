@@ -305,7 +305,8 @@ namespace BME280_I2C
             //H2: 346
             //H3: 0
             //H4: 357
-            //H5: 0            //H6: 30
+            //H5: 0
+            //H6: 30
 
             await Task.Delay(1);
             return CalibrationData;
