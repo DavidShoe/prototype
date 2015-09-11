@@ -32,17 +32,42 @@ namespace MCP3008
             mcp3008.Initialize();
         }
 
-        private async void OnReadClick(object sender, RoutedEventArgs e)
+
+        const float SourceVoltage = 3.3F;
+
+        const float MaxADCValue = 0x3FF; // 10 bit resolution
+
+        // The part has a .5v floor.  So any value is going to be offset by this much.
+        const float VoltageOffset = 0.5F;
+        protected override async void OnNavigatedTo(NavigationEventArgs navArgs)
         {
-            for (byte adc = 0; adc < 8; adc++)
+            Debug.WriteLine("MainPage::OnNavigatedTo");
+
+            byte adc = 0;
+            for (int i = 0; i < 50; i++)
             {
-                for (int i = 0; i < 5; i++)
-                {
-                    int readVal = await mcp3008.ReadADC(adc);
-                    Debug.WriteLine("Read value: " + readVal.ToString());
-                    await Task.Delay(100);
-                }
+                int readVal = await mcp3008.ReadADC(adc);
+
+                // The raw voltage read
+                float voltage = readVal * SourceVoltage;
+
+                voltage /= MaxADCValue;
+
+                // Remove the TMP36 .5v offset
+                voltage -= VoltageOffset;
+
+
+                Debug.WriteLine("Read value: " + readVal.ToString());
+                var temperatureInC = voltage * 100;
+                var temperatureInF = temperatureInC * 9 / 5 + 32;
+                Debug.WriteLine(string.Format("V: {0} C: {1} F: {2}", voltage + VoltageOffset, temperatureInC, temperatureInF));
+                await Task.Delay(100);
             }
+        }
+
+        private void OnReadClick(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

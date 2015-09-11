@@ -50,7 +50,7 @@ namespace MCP3008
         bool Init = false;
         private async Task begin()
         {
-            Debug.WriteLine("TCS34725::begin");
+            Debug.WriteLine("MCP3008::begin");
 
             await Task.Delay(5);
 
@@ -59,14 +59,14 @@ namespace MCP3008
 
         public async Task<int> ReadADC(byte whichChannel)
         {
-            // To line everything up for ease of reading back (on byte boundarys) we 
+            // To line everything up for ease of reading back (on byte boundary) we 
             // will pad the command start bit with 7 leading "0" bits
 
             // Write 0000 000S GDDD xxxx xxxx xxxx
             // Read  ???? ???? ???? ?N98 7654 3210
             // S = start bit
-            // G = Single / Differentail
-            // D = chanel data 
+            // G = Single / Differential
+            // D = Chanel data 
             // ? = undefined, ignore
             // N = 0 "Null bit"
             // 9-0 = 10 data bits
@@ -91,5 +91,6 @@ namespace MCP3008
 
             return sample;
         }
+
     }
 }
